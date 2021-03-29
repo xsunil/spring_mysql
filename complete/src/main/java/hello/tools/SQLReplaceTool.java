@@ -5,7 +5,10 @@ import java.io.*;
 public class SQLReplaceTool
 {
     public static final String fileName = "/Users/sunikumar/cp/tools/test.txt";
-    String input  = "true, PaymentFraud, 1000, ecomorg, ecomorg";
+
+    String input = "true, PaymentFraud, 1000, ecomorg, ecomorg";
+
+    // Output File will be fileName_formatted.sql
 
     //[bitsindri, open, 0, 20]
 
@@ -26,15 +29,15 @@ public class SQLReplaceTool
             StringBuffer sb = new StringBuffer();    //constructs a string buffer with no characters
             String line;
             int questionMarkCounter = 0;
-            while((line=br.readLine())!=null)
+            while ((line = br.readLine()) != null)
             {
-                if(line.contains("?"))
+                if (line.contains("?"))
                 {
-                    while(line.contains("?"))
+                    while (line.contains("?"))
                     {
                         String replacementString = "'" + inputs[questionMarkCounter].trim() + "'";
                         line = line.replaceFirst("\\?", replacementString);
-                        questionMarkCounter = questionMarkCounter +1;
+                        questionMarkCounter = questionMarkCounter + 1;
                     }
                     sb.append(line);
                 }
@@ -50,7 +53,7 @@ public class SQLReplaceTool
             System.out.println(sb.toString());   //returns a string that textually represents the object
             writeToFile(sb.toString());
         }
-        catch(IOException e)
+        catch (IOException e)
         {
             e.printStackTrace();
         }
@@ -61,7 +64,7 @@ public class SQLReplaceTool
         try
         {
             File f = new File(fileName);
-            String sourceFilePath =  f.getAbsolutePath();
+            String sourceFilePath = f.getAbsolutePath();
             String modifiedFile = getFileNameWithoutExtension(sourceFilePath) + "_formatted.sql";
             FileWriter writer = new FileWriter(modifiedFile);
             writer.write(content);
@@ -75,9 +78,12 @@ public class SQLReplaceTool
 
     private String getFileNameWithoutExtension(String fileName)
     {
-        if (fileName.indexOf(".") > 0) {
+        if (fileName.indexOf(".") > 0)
+        {
             return fileName.substring(0, fileName.lastIndexOf("."));
-        } else {
+        }
+        else
+        {
             return fileName;
         }
     }
