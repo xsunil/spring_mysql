@@ -1,0 +1,168 @@
+package hello.tools;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.Statement;
+
+public class MySqlInsertBatch
+{
+    public static final String URL = "jdbc:mysql://127.0.0.1:10075/organization?useSSL=false";
+    public static final String USER_NAME = "organization";
+    public static final String PASSWORD = "organization";
+
+    public static final String FILE_PATH = "/Users/sunikumar/cp/tools/insert/";
+
+    boolean isSeqentialPK = true;
+
+
+    public static void main(String args[])
+    {
+        MySqlInsertBatch mysqlInsert = new MySqlInsertBatch();
+        mysqlInsert.insertUniversity(1, 10, 5,0);
+    }
+
+    private void insertUniversity(int startPk, int universityCount , int collegeCount, int buildingCount)
+    {
+        try
+        {
+            createDirectory( FILE_PATH + "university");
+            String univeristyFilePath = FILE_PATH + "university/" +  "university.sql";
+            FileWriter universityWriter = new FileWriter(univeristyFilePath);
+
+            String header = getUniversitySQL_HEADER();
+            universityWriter.write(header);
+            insertNewLine(universityWriter);
+
+            FileWriter collegeCommandWriter = new FileWriter(FILE_PATH + "command_college.sql");
+            FileWriter universityCommandWriter = new FileWriter(FILE_PATH + "command_university.sql");
+            universityCommandWriter.write(getCommand("university", "university.sql"));
+            int totalIteration = startPk + universityCount;
+
+            for(int i =startPk ; i <= totalIteration; i++)
+            {
+                long universityPK = generatePK(i);
+                String universityName = "bitsindri" + i;
+                String state = "jharkhand" + 1;
+
+                universityWriter.write(getUniversitySQl(universityPK, universityName, state));
+                if(i < totalIteration)
+                {
+                    universityWriter.write(",");
+                    insertNewLine(universityWriter);
+                }
+                universityWriter.flush();
+                // write college header
+                createDirectory( FILE_PATH + "college");
+                String collegeFilePath = FILE_PATH + "college/" + "college_" + i + ".sql";
+
+
+                collegeCommandWriter.write(getCommand("college" , "college_" + i + ".sql"));
+                insertNewLine(collegeCommandWriter);
+                FileWriter collegeWriter = new FileWriter(collegeFilePath);
+                collegeWriter.write(getCollegeSQL_HEADER());
+                insertNewLine(collegeWriter);
+
+                for(int j =1 ; j <= collegeCount; j++)
+                {
+                    long collgePK = System.nanoTime();
+                    String collegeName = "college" + collgePK;
+                    collegeWriter.write(getCollegeSQl(collgePK, universityPK, collegeName));
+                    if(j < collegeCount)
+                    {
+                        collegeWriter.write(",");
+                        insertNewLine(collegeWriter);
+                    }
+                }
+                collegeWriter.close();
+            }
+            collegeCommandWriter.close();
+            universityCommandWriter.close();
+            universityWriter.close();
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private String  getUniversitySQl(long pk, String universityName, String state)
+    {
+        String sql = " ("+ pk + ",'"+universityName+"','"+ state+"', NULL, '2021-07-31 07:21:51.129000',"
+                + "'2021-07-31 07:21:51.129000', 'systemadmin@system.com','systemadmin@system.com', NULL,"
+                + "2010,1"
+                + ")";
+
+        return sql;
+    }
+
+    private String  getCollegeSQl(long pk, long universityPK, String collegeName)
+    {
+        String sql ="("+ pk + ",'"+universityPK+"','"+ collegeName+"', NULL, '2021-07-31 07:21:51.129000',"
+                + "'2021-07-31 07:21:51.129000', 'systemadmin@system.com','systemadmin@system.com', NULL,"
+                + "1"
+                + ")";
+
+        return sql;
+    }
+
+
+    private String getUniversitySQL_HEADER()
+    {
+        String sql ="INSERT INTO ORG_UNIVERSITY "
+                + "("
+                + "PK, UNIVERSITY_NAME,STATE, PROCESS, UPDATED_TIMESTAMP,"
+                + "CREATED_TIMESTAMP,CREATED_BY,UPDATED_BY,CONTEXT_ID,"
+                + "FOUNDING_YEAR,VERSION"
+                + ") VALUES ";
+
+        return sql;
+    }
+
+    private String getCollegeSQL_HEADER()
+    {
+        String sql ="INSERT INTO ORG_COLLEGE "
+                + "("
+                + "PK, UNIVERSITY_PK, COLLEGE_NAME, PROCESS, UPDATED_TIMESTAMP,"
+                + "CREATED_TIMESTAMP,CREATED_BY,UPDATED_BY,CONTEXT_ID,"
+                + "VERSION"
+                + ") VALUES ";
+        return sql;
+    }
+
+
+
+    private void insertNewLine(FileWriter writer) throws Exception
+    {
+        writer.write(System.getProperty( "line.separator" ));
+    }
+
+
+    public static String  getCommand(String directory, String command)
+    {
+        return "source /home/insert/" + directory+ "/" + command + ";";
+    }
+
+    private void createDirectory(String path) throws Exception
+    {
+        Files.createDirectories(Paths.get(path));
+    }
+
+    private Long generatePK(int i)
+    {
+        if(isSeqentialPK)
+        {
+            return Long.valueOf(i);
+        }
+        else
+        {
+            return System.nanoTime();
+        }
+    }
+
+}
