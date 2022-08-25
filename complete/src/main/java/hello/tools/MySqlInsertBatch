@@ -14,6 +14,9 @@ public class MySqlInsertBatch
     public static final String PASSWORD = "organization";
 
     public static final String FILE_PATH = "/Users/sunikumar/cp/tools/insert/";
+    
+    // docker copy command 
+    // docker cp /Users/sunikumar/cp/tools/insert/university.sql cc4b2500192a:home
 
     boolean isSeqentialPK = true;
 
