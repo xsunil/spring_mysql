@@ -35,9 +35,10 @@ dependencies {
         exclude group: "org.hibernate", module: "hibernate-entitymanager"
     }
     
-    compile 'org.eclipse.persistence:org.eclipse.persistence.jpa:2.6.1'
+    compile 'org.eclipse.persistence:org.eclipse.persistence.jpa:2.7.9'
     //weaver 'org.eclipse.persistence:org.eclipse.persistence.jpa:2.6.1'
-    
+
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 
     // Use MySQL Connector-J
     compile 'mysql:mysql-connector-java'
